@@ -4,6 +4,9 @@
 # module is intended to install and configure Grafana's promtail tool for shipping
 # logs to Loki.
 #
+# @param [Boolean] service_enable
+#   The value passed to the service resource's enable parameter for promtail's service
+#
 # @param [Enum['running', 'stopped']] service_ensure
 #   The value passed to the service resource's ensure parameter for promtail's service
 #
@@ -53,6 +56,9 @@
 # @param [Optional[Sensitive[String[1]]]] password_file_content
 #   The value to be placed in the password file. This value is cast to Sensitive via
 #   lookup_options defined in `data/common.yaml`
+#
+# @param [Stdlib::HTTPUrl] source_url
+#   The URL from which promtail packages can be downloaded
 #
 # @example
 #   include promtail
@@ -111,8 +117,8 @@
 #   }
 #
 class promtail (
-  Enum['running', 'stopped']     $service_ensure,
   Boolean                        $service_enable,
+  Enum['running', 'stopped']     $service_ensure,
   Hash                           $clients_config_hash,
   Hash                           $positions_config_hash,
   Hash                           $scrape_configs_hash,
