@@ -69,7 +69,6 @@ promtail::positions_config_hash:
 promtail::scrape_configs_hash:
   scrape_configs:
     - job_name: system_secure
-      entry_parser: raw
       static_configs:
       - targets:
           - localhost
@@ -78,7 +77,6 @@ promtail::scrape_configs_hash:
           host: "%{facts.networking.fqdn}"
           __path__: /var/log/secure
     - job_name: system_messages
-      entry_parser: raw
       static_configs:
       - targets:
           - localhost
