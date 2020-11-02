@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  release:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install the Puppet PDK
+        run: |
+          wget https://apt.puppet.com/puppet-tools-release-bionic.deb
+          sudo dpkg -i puppet-tools-release-bionic.deb
+          sudo apt-get update 
+          sudo apt-get install pdk
+      - name: Validate docs & do release
+        run: |
+          # Until https://tickets.puppetlabs.com/browse/PDK-1677 is resolved
+          # this step is broken up into two commands
+          pdk release prep --force --skip-changelog --version $GITHUB_REF
+          pdk bundle exec rake changelog
+
+          # validate the command(s) above did not change anything
+          if output=$(git status --porcelain) && [ -z "$output" ]; then
+            pdk release --skip-changelog --skip-documentation --forge-token ${{ PUPPET_FORGE_API_KEY }}
+          else
+            echo "Things changed when running the release prep commands for version ${GITHUB_REF}'"
+            git status --porcelain
+            exit 1
+          fi
